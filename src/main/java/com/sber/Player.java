@@ -2,11 +2,12 @@ package com.sber;
 
 import lombok.Data;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Random;
 
 @Data
-public class Player {
+public class Player implements Serializable {
     private int health;
     private int gold;
     private Location location;

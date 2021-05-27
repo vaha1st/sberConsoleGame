@@ -2,15 +2,20 @@ package com.sber;
 
 import com.sber.initialization.GameInitializer;
 
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.time.LocalDateTime;
 import java.util.InputMismatchException;
+import java.util.List;
 import java.util.Scanner;
+import java.util.stream.Collectors;
 
-public class App
-{
+public class App {
     static GameInitializer gameInitializer;
 
-    public static void main( String[] args )
-    {
+    public static void main(String[] args) {
         showMenu(true);
     }
 
@@ -53,11 +58,21 @@ public class App
                     }
                     break;
                 case "load":
-                    command = "exit";
+                    try {
+                        if (load() == 1){
+                            command = "exit";
+                            play(false);
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                        command = "";
+                        System.out.println("Cannot load the game. Save file corrupted or not exists");
+                    }
                     break;
                 case "save":
                     if (!firstRun) {
                         command = "exit";
+                        save();
                         play(false);
                     }
                     break;
@@ -147,6 +162,61 @@ public class App
                 command = "exit";
             }
         }
+    }
+
+    private static void save() {
+        LocalDateTime dateTime = LocalDateTime.now().withNano(0);
+        String path = Paths.get("").toAbsolutePath().toString() +
+                "/src/main/resources/saves/save_" + dateTime.toString();
+        try (FileOutputStream outputStream = new FileOutputStream(path);
+             ObjectOutputStream objOutputStream = new ObjectOutputStream(outputStream)) {
+            objOutputStream.writeObject(gameInitializer);
+        } catch (IOException e) {
+            System.out.println("Can not save the game");
+            System.out.println(e.getMessage());
+        }
+    }
+
+    private static int load() throws IOException {
+        Scanner scanner = new Scanner(System.in);
+        String savesFolder = Paths.get("src/main/resources/saves").toString();
+        int choice;
+        List<File> saves = Files
+                            .walk(Paths.get(savesFolder))
+                            .filter(Files::isRegularFile)
+                            .map(Path::toFile)
+                            .collect(Collectors.toList());
+
+        if (saves.size() > 0) {
+            System.out.println("---------------------- SAVES ------------------------");
+            int counter = 1;
+            for (File file : saves) {
+                System.out.println(counter++ + ") " + file.getName());
+            }
+            System.out.println("Please enter the number of save. For example 1");
+            try {
+                choice = scanner.nextInt() - 1;
+            } catch (InputMismatchException e) {
+                System.out.println("Invalid input");
+                return 0;
+            }
+            if (choice < 0 || saves.get(choice) == null) {
+                System.out.println("No such saved game");
+                return 0;
+            }
+            try (FileInputStream inputStream
+                         = new FileInputStream(savesFolder + "/" + saves.get(choice).getName());
+            ObjectInputStream objInputStream = new ObjectInputStream(inputStream)) {
+                gameInitializer = (GameInitializer) objInputStream.readObject();
+            } catch (IOException | ClassNotFoundException e) {
+                System.out.println("Cannot load the game. Save file corrupted or not exists");
+            }
+
+        } else {
+            System.out.println("No saved games");
+            return 0;
+        }
+        return 1;
     }
 
     private static boolean won(Player player, int goal) {

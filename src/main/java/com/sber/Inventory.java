@@ -5,13 +5,14 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 @Getter
 @Setter
 @EqualsAndHashCode
-public class Inventory {
+public class Inventory implements Serializable {
 
     private List<Item> items;
 

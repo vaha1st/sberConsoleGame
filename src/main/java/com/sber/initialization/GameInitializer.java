@@ -3,20 +3,21 @@ package com.sber.initialization;
 import com.sber.*;
 import lombok.Data;
 
+import java.io.Serializable;
 import java.util.*;
 import java.util.stream.Collectors;
 
 @Data
-public class GameInitializer {
+public class GameInitializer implements Serializable {
 
     int mapSize;
     int goal;
     Player player;
-    List<Item> items;
-    List<Item> treasures;
-    List<String> locationNames;
     Location map;
-    static int count;
+    List<Item> items;
+    transient List<Item> treasures;
+    transient List<String> locationNames;
+    transient static int count;
 
     public GameInitializer(int mapSize) {
 

@@ -2,12 +2,13 @@ package com.sber;
 
 import lombok.Data;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
 @Data
-public class Location implements Cloneable{
+public class Location implements Cloneable, Serializable {
     private String name;
     private String description;
     private Inventory inventory;

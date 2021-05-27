@@ -3,9 +3,11 @@ package com.sber;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
+import java.io.Serializable;
+
 @Data
 @AllArgsConstructor
-public class Item implements Cloneable{
+public class Item implements Cloneable, Serializable {
     private String name;
     private String description;
     int     hp;
