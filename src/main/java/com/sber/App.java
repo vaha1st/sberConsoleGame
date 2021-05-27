@@ -16,6 +16,16 @@ public class App {
     static GameInitializer gameInitializer;
 
     public static void main(String[] args) {
+        File savesDir = new File("src/main/resources/saves");
+        if (!savesDir.exists()){
+            try {
+                savesDir.mkdir();
+            } catch (SecurityException e) {
+                System.out.println("Not enough rights for creating saves folder. " +
+                        "Save/Load will not be available. " +
+                        "Or create src/main/resources/saves manually");
+            }
+        }
         showMenu(true);
     }
 
@@ -64,7 +74,6 @@ public class App {
                             play(false);
                         }
                     } catch (IOException e) {
-                        e.printStackTrace();
                         command = "";
                         System.out.println("Cannot load the game. Save file corrupted or not exists");
                     }
@@ -173,7 +182,6 @@ public class App {
             objOutputStream.writeObject(gameInitializer);
         } catch (IOException e) {
             System.out.println("Can not save the game");
-            System.out.println(e.getMessage());
         }
     }
 
